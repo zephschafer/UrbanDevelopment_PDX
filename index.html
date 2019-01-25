@@ -25,7 +25,7 @@
 </head>
 <body>
 <div id = "header">
-  <h1>Development Map</h1>
+  <h1>PDX Development Map</h1>
 </div>
 <!-- <div id = "tempbox">
   <h2>Updates</h2>
@@ -78,12 +78,12 @@ map.on('mouseleave', 'building-extrusion', function () {
 map.on('load', function() {
     map.addSource("buildings", {
           type: "geojson",
-          data: "./scraper/data/buildings.geojson" //"./GeoObs.json",
+          data: "./data/buildings.geojson" //"./GeoObs.json",
       });
 
     map.addSource("addresses", {
           type: "geojson",
-          data: "./scraper/data/addresses.geojson" //"./GeoObs.json",
+          data: "./data/addresses.geojson" //"./GeoObs.json",
       });
 
     map.addLayer({
