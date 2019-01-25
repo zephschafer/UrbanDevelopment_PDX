@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset='utf-8' />
+  <title>PDX Development Map</title>
+  <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+  <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.49.0/mapbox-gl.js'></script>
+  <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.49.0/mapbox-gl.css' rel='stylesheet' />
+  <link href="https://fonts.googleapis.com/css?family=Roboto|ZCOOL+QingKe+HuangYou" rel="stylesheet">
+  <style>
+    body { margin:0; padding:0; background-color: rgb(30, 30, 30); font-family: 'Muli', sans-serif;  }
+    #map-container { position: absolute; right:50px; top:100px; height: 600px; width: 700px; }
+    #map { position: relative; height: inherit; width: inherit; }
+    #header { position: relative; left:50px; top:0px; height: 600px; width: 700px; color:rgb(236, 236, 233);}
+    #tempbox { position: absolute; left:50px; top:100px; height: 600px; width: 700px; color:rgb(236, 236, 233); }
+    .marker {
+      background-image: url('mapbox-icon.png');
+      background-size: cover;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+<div id = "header">
+  <h1>Development Map</h1>
+</div>
+<!-- <div id = "tempbox">
+  <h2>Updates</h2>
+  <li>Updated: Jan 19, 2019</li>
+  <li>Updated: Jan 18, 2019</li>
+</div> -->
+<div id="map-container">
+  <div id='map'></div>
+</div>
+<script>
+mapboxgl.accessToken = 'pk.eyJ1IjoienNjaGFmZXIiLCJhIjoiY2pxemlhdnU2MDM3cDQ5bW16MzIxNzJjbyJ9.gtaQ0ou-b_-Xng3bg0Vk0g';
+const map = new mapboxgl.Map({
+  container: 'map',
+  style: 'mapbox://styles/zschafer/cjr28c4ce02es2rob0g4r5uhe',
+  center: [-122.677938, 45.514310],
+  zoom: 14,
+  pitch: 60
+});
+
+// Add zoom and rotation controls to the map.
+map.addControl(new mapboxgl.NavigationControl());
+
+// When a click event occurs on a feature in the states layer, open a popup at the
+// location of the click, with description HTML from its properties.
+map.on('click', 'building-extrusion', function (e) {
+    new mapboxgl.Popup()
+        .setLngLat(e.lngLat)
+        // .setHTML("Year Built: " + e.features[0].properties.YEAR_BUILT)
+        .setHTML("Height (Meters): " + e.features[0].properties.map_height )
+        .addTo(map);
+});
+
+// Change the cursor to a pointer when the mouse is over the states layer.
+map.on('mouseenter', 'building-extrusion', function () {
+    map.getCanvas().style.cursor = 'pointer';
+});
+
+// Change it back to a pointer when it leaves.
+map.on('mouseleave', 'building-extrusion', function () {
+    map.getCanvas().style.cursor = '';
+});
+
+// 3d Buildings (Code below is from example 2)
+//  1 - Display Buildings in 3D <https://docs.mapbox.com/mapbox-gl-js/example/3d-buildings/>
+//  2 - Extrude Polygons for 3D indoor Mapping <https://docs.mapbox.com/mapbox-gl-js/example/3d-extrusion-floorplan/>)
+//  3 - Add GeoJSON polygon <https://docs.mapbox.com/mapbox-gl-js/example/geojson-polygon/>
+//  4 - Add Live RealTime Data <https://docs.mapbox.com/mapbox-gl-js/example/live-geojson/>
+//  5 - Update a Feature in RealTime <https://docs.mapbox.com/mapbox-gl-js/example/live-update-feature/>
+
+map.on('load', function() {
+    map.addSource("buildings", {
+          type: "geojson",
+          data: "./scraper/data/buildings.geojson" //"./GeoObs.json",
+      });
+
+    map.addSource("addresses", {
+          type: "geojson",
+          data: "./scraper/data/addresses.geojson" //"./GeoObs.json",
+      });
+
+    map.addLayer({
+        'id': 'building-extrusion',
+        'type': 'fill-extrusion',
+        'source': "buildings",
+        'paint': {
+            // ["get", "color"]
+            'fill-extrusion-color': ["get", "map_color"],
+            'fill-extrusion-height': ["get", "map_height"],
+            'fill-extrusion-base': 0,
+            'fill-extrusion-opacity': 1
+        }
+    });
+
+map.addLayer({
+    'id': 'addresses',
+    'type': 'fill-extrusion',
+    'source': "addresses",
+    'paint': {
+        'fill-extrusion-color': ["get", "map_color"],
+        'fill-extrusion-height': ["get", "map_height"],
+        'fill-extrusion-base': 0,
+        'fill-extrusion-opacity': 1
+    }
+});
+});
+
+
+</script>
+
+</body>
+</html>
